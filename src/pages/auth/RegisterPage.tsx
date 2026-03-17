@@ -57,7 +57,7 @@ export default function RegisterPage() {
       await register({ name, email, password, confirmPassword });
       toast({
         title: 'Account created!',
-        description: 'Welcome to Pillio. Let\'s set up your medications.',
+        description: 'Welcome to MediMate. Let\'s set up your medications.',
       });
       navigate(ROUTES.DASHBOARD);
     } catch (error) {
@@ -86,7 +86,7 @@ export default function RegisterPage() {
           </div>
           <h2 className="text-3xl font-bold mb-4">Your health, simplified</h2>
           <p className="text-lg opacity-90 mb-8">
-            Join thousands of users who trust Pillio to manage their medications effectively.
+            Join thousands of users who trust MediMate to manage their medications effectively.
           </p>
           <ul className="space-y-3">
             {features.map((feature, index) => (
@@ -120,7 +120,7 @@ export default function RegisterPage() {
             <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-2xl">P</span>
             </div>
-            <span className="text-2xl font-bold text-foreground">Pillio</span>
+            <span className="text-2xl font-bold text-foreground">MediMate</span>
           </Link>
 
           <h1 className="text-3xl font-bold text-foreground mb-2">Create your account</h1>

@@ -26,7 +26,8 @@ class Medicine(BaseModel):
     # Relationships
     user = relationship("User", back_populates="medicines")
     prescription_medicines = relationship("PrescriptionMedicine", back_populates="medicine")
-    reminders = relationship("Reminder", back_populates="medicine")
+    reminders = relationship("Reminder", back_populates="medicine", cascade="all, delete",
+    passive_deletes=True)
     inventory_history = relationship("InventoryHistory", back_populates="medicine", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:

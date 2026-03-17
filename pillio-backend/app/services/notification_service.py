@@ -10,6 +10,7 @@ from app.schemas.notification import (
     NotificationCount, BulkNotificationUpdate, NotificationActionRequest
 )
 from app.schemas.common import NotificationType
+from sqlalchemy import delete
 
 
 class NotificationService:
@@ -161,23 +162,16 @@ class NotificationService:
         return True
     
     async def clear_all_notifications(self, user_id: int) -> int:
-        """Delete all notifications for a user"""
-        query = select(Notification.id).where(Notification.user_id == user_id)
-        result = await self.db.execute(query)
-        notification_ids = result.scalars().all()
-        
-        count = len(notification_ids)
-        
-        delete_query = select(Notification).where(Notification.user_id == user_id)
-        delete_result = await self.db.execute(delete_query)
-        notifications = delete_result.scalars().all()
-        
-        for notification in notifications:
-            await self.db.delete(notification)
-        
+        count_query = select(func.count(Notification.id)).where(Notification.user_id == user_id)
+        result = await self.db.execute(count_query)
+        count = result.scalar() or 0
+
         if count > 0:
-            await self.db.commit()
-        
+            await self.db.execute(
+                delete(Notification).where(Notification.user_id == user_id)
+        )
+        await self.db.commit()
+
         return count
     
     async def get_notification_counts(
@@ -280,6 +274,19 @@ class NotificationService:
         
         return count
     
+    async def notification_exists(self, user_id, type, reference_id):
+        query = select(Notification).where(
+        and_(
+            Notification.user_id == user_id,
+            Notification.type == type,
+            Notification.reference_id == reference_id,
+            Notification.is_read == False
+        )
+    )
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
+    
     async def take_action(
         self,
         notification_id: int,
@@ -345,8 +352,19 @@ class NotificationService:
         user_id: int,
         medicine_name: str,
         dosage: str,
+        medicine_id: Optional[int] = None,
         reminder_id: Optional[int] = None
     ) -> Notification:
+        
+        existing = await self.notification_exists(
+            user_id,
+            NotificationType.LOW_STOCK.value,
+                medicine_id
+            )
+
+        if existing:
+            return existing
+    
         """Create a time-to-take-medicine notification"""
         notification_data = NotificationCreate(
             user_id=user_id,
@@ -365,6 +383,15 @@ class NotificationService:
         remaining_quantity: int,
         medicine_id: Optional[int] = None
     ) -> Notification:
+        
+        existing = await self.notification_exists(
+        user_id,
+        NotificationType.LOW_STOCK.value,
+        medicine_id
+    )
+
+        if existing:
+            return existing
         """Create a low stock alert notification"""
         notification_data = NotificationCreate(
             user_id=user_id,
@@ -381,8 +408,18 @@ class NotificationService:
         user_id: int,
         doctor_name: str,
         days_until_expiry: int,
+        medicine_id: Optional[int] = None,
         prescription_id: Optional[int] = None
     ) -> Notification:
+        
+        existing = await self.notification_exists(
+        user_id,
+        NotificationType.LOW_STOCK.value,
+        medicine_id
+    )
+
+        if existing:
+            return existing
         """Create a prescription expiry notification"""
         notification_data = NotificationCreate(
             user_id=user_id,
@@ -401,6 +438,15 @@ class NotificationService:
         days_until_empty: int,
         medicine_id: Optional[int] = None
     ) -> Notification:
+        
+        existing = await self.notification_exists(
+        user_id,
+        NotificationType.LOW_STOCK.value,
+        medicine_id
+    )
+
+        if existing:
+            return existing
         """Create a refill suggestion notification"""
         notification_data = NotificationCreate(
             user_id=user_id,

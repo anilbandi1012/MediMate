@@ -6,14 +6,12 @@ from app.schemas.common import FileUploadResponse
 
 # Prescription medicine item for creating/updating
 class PrescriptionMedicineCreate(BaseModel):
-    """Schema for adding a medicine to a prescription"""
-    id: Optional[int] = None  # For updates
-    medicine_id: Optional[int] = None  # Optional: link to inventory medicine
-    medicine_name: str  # Required: medicine name
-    dosage: str  # e.g., "500mg", "10ml"
-    frequency: str  # e.g., "twice daily", "every 8 hours"
-    duration_days: int  # e.g., 7, 14, 30
-    instructions: Optional[str] = None  # e.g., "take with food"
+    medicine_name: Optional[str] = Field(None, description="Name of the medicine")
+    dosage: Optional[str] = Field(None, description="Dosage amount, e.g., '500mg'")
+    form: Optional[str] = Field(None, description="Form of the medicine, e.g., 'tablet', 'syrup'")
+    frequency: Optional[str] = Field(None, description="Frequency of intake, e.g., 'twice a day'")
+    duration_days: Optional[int] = Field(None, description="Duration in days")
+    instructions: Optional[str] = Field(None, description="Additional instructions")
 
 
 # Prescription medicine item in response
@@ -43,10 +41,15 @@ class PrescriptionBase(BaseModel):
 
 
 # Prescription creation schema
-class PrescriptionCreate(PrescriptionBase):
-    """Schema for creating a new prescription with multiple medicines"""
-    medicines: List[PrescriptionMedicineCreate] = Field(..., min_length=1, description="At least one medicine is required")
-    image: Optional[bytes] = None  # For file upload
+class PrescriptionCreate(BaseModel):
+    doctor_name: str = Field(..., description="Name of the prescribing doctor")
+    hospital_clinic: Optional[str] = Field(None, description="Hospital or clinic name")
+    prescription_date: Optional[str] = Field(None, description="Date of prescription (YYYY-MM-DD)")
+    valid_until: Optional[str] = Field(None, description="Expiry date of prescription (YYYY-MM-DD)")
+    notes: Optional[str] = Field(None, description="Additional notes")
+    medicines: Optional[List[PrescriptionMedicineCreate]] = Field(
+        None, description="List of medicines (can be empty or partial)"
+    )
 
 
 # Prescription update schema
@@ -61,9 +64,15 @@ class PrescriptionUpdate(BaseModel):
 
 
 # Prescription update with medicines
-class PrescriptionUpdateWithMedicines(PrescriptionUpdate):
-    """Schema for updating prescription with medicines"""
-    medicines: Optional[List[PrescriptionMedicineCreate]] = None
+class PrescriptionUpdateWithMedicines(BaseModel):
+    doctor_name: Optional[str] = Field(None, description="Name of the prescribing doctor")
+    hospital_clinic: Optional[str] = Field(None, description="Hospital or clinic name")
+    prescription_date: Optional[str] = Field(None, description="Date of prescription (YYYY-MM-DD)")
+    valid_until: Optional[str] = Field(None, description="Expiry date of prescription (YYYY-MM-DD)")
+    notes: Optional[str] = Field(None, description="Additional notes")
+    medicines: Optional[List[PrescriptionMedicineCreate]] = Field(
+        None, description="List of medicines (can be empty or partial)"
+    )
 
 
 # Prescription response schema (base)

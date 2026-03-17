@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Boolean, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, String, Text, Boolean, Integer, ForeignKey, DateTime, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.models.base import BaseModel
@@ -6,6 +6,12 @@ from app.models.base import BaseModel
 
 class Notification(BaseModel):
     __tablename__ = "notifications"
+    __table_args__ = (
+        Index("idx_notification_user", "user_id"),
+        Index("idx_notification_read", "is_read"),
+        Index("idx_notification_type", "type"),
+        Index("idx_notification_created", "created_at"),
+    )
     
     # Notification content
     type = Column(String(50), nullable=False)  # reminder, low_stock, prescription_expiry, refill, system

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
+from sqlalchemy import Date
 
 
 class PrescriptionMedicine(BaseModel):
@@ -22,6 +23,7 @@ class PrescriptionMedicine(BaseModel):
     frequency = Column(String(100), nullable=False)
     duration_days = Column(Integer, nullable=False)
     instructions = Column(Text, nullable=True)
+    
     
     # Relationships
     prescription = relationship("Prescription", back_populates="prescription_medicines")
