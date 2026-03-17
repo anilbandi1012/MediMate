@@ -8,6 +8,7 @@ python-multipart
 requests
 sqlalchemy
 asyncpg
+psycopg2-binary
 apscheduler
 passlib
 python-jose
