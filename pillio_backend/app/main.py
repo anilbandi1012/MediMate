@@ -75,7 +75,6 @@ app = FastAPI(
     redoc_url="/redoc" if settings.debug else None,
 )
 
-app = FastAPI(title="Pillio Backend")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
