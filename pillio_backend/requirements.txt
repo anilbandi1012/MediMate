@@ -10,3 +10,4 @@ sqlalchemy
 apscheduler
 passlib
 python-jose
+pydantic-settings
