@@ -25,13 +25,29 @@ import HistoryPage from "@/pages/HistoryPage";
 import ReportsPage from "@/pages/ReportsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/NotFound";
+// import UploadPrescriptionPage from "@/pages/UploadPrescriptionPage";
+import OCRUpload from "@/components/OCRUpload";
 
 import { ROUTES } from "@/lib/constants";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          console.log("Service Worker registered:", registration);
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
+  }, []);
 
   if (isLoading) {
     return (

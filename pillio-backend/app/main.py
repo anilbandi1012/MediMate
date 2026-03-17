@@ -13,14 +13,22 @@ from app.api.prescriptions import router as prescriptions_router
 from app.api.reminders import router as reminders_router
 from app.api.notifications import router as notifications_router
 from app.api.search import router as search_router
+from app.api.subscription import router as subscription_router
 from app.core.scheduler import start_scheduler, stop_scheduler
+from app.api.v1.ocr import router as ocr_router
 from app.core.exceptions import (
     AuthException, PermissionException, ValidationException,
     NotFoundException, ConflictException, BadRequestException
 )
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from app.jobs.notifications_scheduler import run_notification_checks
+from app.jobs.notifications_scheduler import check_low_stock
 
 logger = logging.getLogger(__name__)
 
+scheduler = AsyncIOScheduler()
+scheduler.add_job(run_notification_checks, "interval", minutes=1)
+scheduler.start()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -67,6 +75,7 @@ app = FastAPI(
     redoc_url="/redoc" if settings.debug else None,
 )
 
+app = FastAPI(title="Pillio Backend")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -175,6 +184,13 @@ app.include_router(
     tags=["Notifications"]
 )
 
+app.include_router(
+    subscription_router,
+    prefix=f"{settings.api_v1_str}",
+    tags=["Subscription"]
+)    
+
+app.include_router(ocr_router, prefix="/api/v1")
 
 # Health check endpoint
 @app.get("/health")

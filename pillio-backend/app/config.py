@@ -16,10 +16,13 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/pillio"
     
     # Security
-    secret_key: str = "your-super-secret-jwt-key-change-this-in-production"
+    secret_key: str = "MuVt7L2DFfJnSjw2bkp8eHU-qKdiSu0c6gkV9uqhmp8"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
+    VAPID_PRIVATE_KEY: str
+    VAPID_PUBLIC_KEY: str
+
     
     # API
     api_v1_str: str = "/api/v1"
@@ -47,8 +50,8 @@ class Settings(BaseSettings):
     smtp_tls: bool = True
     smtp_port: int = 587
     smtp_host: str = "smtp.gmail.com"
-    smtp_user: Optional[str] = None
-    smtp_password: Optional[str] = None
+    smtp_user: Optional[str] = "raju137raj@gmail.com"
+    smtp_password: Optional[str] = "tizt hbiw gtri chxy"
     emails_from_email: Optional[str] = None
     emails_from_name: str = "Pillio"
     

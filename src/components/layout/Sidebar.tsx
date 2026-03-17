@@ -171,7 +171,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className="text-center"
               >
                 <p className="text-xs text-muted-foreground">
-                  Pillio v1.0.0
+                  Medimate v1.0.0
                 </p>
               </motion.div>
             )}

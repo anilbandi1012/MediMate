@@ -28,6 +28,7 @@ export default function PrescriptionsPage() {
   
   const [selectedPrescription, setSelectedPrescription] = useState<PrescriptionWithMedicines | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  // const [ocrData, setOcrData] = useState<any>(null);
   
   const { toast } = useToast();
 
@@ -69,6 +70,11 @@ export default function PrescriptionsPage() {
 
     return () => clearTimeout(delaySearch);
   }, [searchQuery]);
+
+  // useEffect(() => {
+  //   const data = localStorage.getItem("ocrResult");
+  //   if (data) setOcrData(JSON.parse(data));
+  // }, []);
 
   const handleView = (prescription: PrescriptionWithMedicines) => {
     setSelectedPrescription(prescription);
@@ -212,6 +218,13 @@ export default function PrescriptionsPage() {
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />
+       {/* {ocrData ? (
+        <pre className="mt-4 bg-gray-900 text-white p-4 rounded">
+          {JSON.stringify(ocrData, null, 2)}
+        </pre>
+      ) : (
+        <p>No prescription uploaded yet</p>
+      )} */}
     </div>
   );
 }

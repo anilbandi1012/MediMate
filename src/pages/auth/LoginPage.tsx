@@ -56,9 +56,9 @@ export default function LoginPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-2xl">P</span>
+              <span className="text-primary-foreground font-bold text-2xl">M</span>
             </div>
-            <span className="text-2xl font-bold text-foreground">Pillio</span>
+            <span className="text-2xl font-bold text-foreground">MediMate</span>
           </Link>
 
           <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back</h1>

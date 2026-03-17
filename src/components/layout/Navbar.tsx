@@ -48,10 +48,10 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="text-primary-foreground font-bold text-lg">P</span>
+            <span className="text-primary-foreground font-bold text-lg">M</span>
           </motion.div>
           <span className="hidden md:inline-block font-semibold text-lg text-foreground">
-            Pillio
+            Medimate
           </span>
         </Link>
 
