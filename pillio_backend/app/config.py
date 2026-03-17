@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/pillio"
+    database_url: str = os.getenv("DATABASE_URL");
     
     # Security
     secret_key: str = "MuVt7L2DFfJnSjw2bkp8eHU-qKdiSu0c6gkV9uqhmp8"
