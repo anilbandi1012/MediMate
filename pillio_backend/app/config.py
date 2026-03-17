@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import List, Optional
+from pydantic import Field
 import os
 import logging
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Settings(BaseSettings):
 
     # Database
-    database_url: str
+    database_url: str = Field(..., alias="DATABASE_URL")
 
     # Security
     secret_key: str = "MuVt7L2DFfJnSjw2bkp8eHU-qKdiSu0c6gkV9uqhmp8"
@@ -64,7 +65,8 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        case_sensitive = True
+        case_sensitive = False
+        populate_by_name = True
 
     def get_database_url(self) -> str:
         return self.database_url
