@@ -68,3 +68,23 @@ env/
 # IDEs and miscellaneous
 .idea/  # For JetBrains PyCharm
 *.swp
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Node
+node_modules/
+npm-debug.log
+
+# Environment
+.env
+
+# Expo
+.expo/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
