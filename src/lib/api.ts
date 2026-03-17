@@ -1,7 +1,7 @@
 // API Client wrapper using Axios for FastAPI backend
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pillio-backend.onrender.com/api/v1';
 
 // Helper functions for token storage
 const getToken = (storageType: 'local' | 'session') => 
