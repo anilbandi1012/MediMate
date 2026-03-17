@@ -6,7 +6,7 @@ from app.config import settings
 
 # IMPORTANT: load models before creating tables
 import app.models
-from app.models import Base
+from app.models import base
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ async def create_db_and_tables():
 
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(base.metadata.create_all)
 
         logger.info("Database tables created successfully")
 
@@ -58,7 +58,7 @@ async def drop_db_and_tables():
 
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(base.metadata.drop_all)
 
         logger.info("Database tables dropped successfully")
 
