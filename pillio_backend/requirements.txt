@@ -12,3 +12,14 @@ apscheduler
 passlib
 python-jose
 pydantic-settings
+email-validator
+alembic
+argon2-cffi
+pydantic
+python-dotenv
+cors
+aiofiles
+fastapi-cors
+pytest
+pytest-asyncio
+httpx
