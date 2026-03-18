@@ -10,6 +10,8 @@ WORKDIR /app
 
 COPY . .
 
+ENV PYTHONPATH=/app/pillio_backend
+
 RUN pip install --no-cache-dir -r pillio_backend/requirements.txt
 
 CMD ["uvicorn", "pillio_backend.app.main:app", "--host", "0.0.0.0", "--port", "10000"]
