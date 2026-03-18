@@ -19,6 +19,9 @@ const OCRUpload = ({ onResult }: OCRUploadProps) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    console.log("FILE:", file);
+    console.log("SIZE:", file.size);
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -26,7 +29,12 @@ const OCRUpload = ({ onResult }: OCRUploadProps) => {
       setLoading(true);
       const res = await axios.post(
         "https://medimate-k4yl.onrender.com/api/v1/ocr/extract-text",
-        formData
+        formData,
+        {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
       );
 
       // 🔥 PUSH DIRECTLY INTO STATE
@@ -36,9 +44,11 @@ const OCRUpload = ({ onResult }: OCRUploadProps) => {
       localStorage.setItem("ocrResult", JSON.stringify(res.data));
 
     } catch (err) {
+       console.error(err);
       alert("OCR failed");
     } finally {
       setLoading(false);
+      e.target.value = null; // reset file input
     }
   };
 
