@@ -5,11 +5,8 @@ import numpy as np
 from PIL import Image
 import os
 
-# Windows-specific Tesseract path
-TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-if os.path.exists(TESSERACT_PATH):
-    pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+if os.name == "nt":  # Windows only
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 def extract_text_from_image(image_path: str) -> str:
