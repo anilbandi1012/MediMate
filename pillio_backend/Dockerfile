@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 🔥 move directly into backend folder
-WORKDIR /pillio
+WORKDIR /app
 
 COPY . .
 
