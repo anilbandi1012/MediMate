@@ -64,7 +64,7 @@ export default function DashboardPage() {
         applicationServerKey: urlBase64ToUint8Array("BFapiROU-4n2Now3HdPm9UBz0jKtYdYAbGW7vw5NyNzmTFonZG3fiXExZmzyUk-xC7-wSA7mEQWsVwyi6IJMTNU")
       });
 
-      await fetch("http://localhost:8000/api/v1/subscription/save-subscription", {
+      await fetch("https://medimate-k4yl.onrender.com/api/v1/subscription/save-subscription", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
