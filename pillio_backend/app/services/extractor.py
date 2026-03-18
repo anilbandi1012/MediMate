@@ -45,13 +45,22 @@ async def extract_text_from_file(file: UploadFile) -> str:
 
         # --- Image Handling ---
         else:
+            await file.seek(0)  # Reset file pointer to the beginning
             content = await file.read()
+            if not content:
+                raise HTTPException(status_code=400, detail="Empty file received")
+
             nparr = np.frombuffer(content, np.uint8)
+    
+            if nparr.size == 0:
+             raise HTTPException(status_code=400, detail="Invalid image data")
+
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
             if img is None:
-                raise HTTPException(status_code=400, detail="Failed to read image")
-            
-            text =  pytesseract.image_to_string(img)
+                raise HTTPException(status_code=400, detail="Failed to decode image")
+
+            text = pytesseract.image_to_string(img)
             return text.strip()
 
     except Exception as e:
