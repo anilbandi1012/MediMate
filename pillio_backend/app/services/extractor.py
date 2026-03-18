@@ -51,7 +51,7 @@ async def extract_text_from_file(file: UploadFile) -> str:
             if img is None:
                 raise HTTPException(status_code=400, detail="Failed to read image")
             
-            text = pytesseract.image_to_string(img)
+            text =  pytesseract.image_to_string(img)
             return text.strip()
 
     except Exception as e:
