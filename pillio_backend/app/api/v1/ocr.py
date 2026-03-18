@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 import shutil
 import os
 from app.services.ocr import extract_text_from_image
+from app.services.extractor import extract_text_from_file
 from app.config import settings
 
 router = APIRouter(prefix="/ocr", tags=["OCR"])
@@ -20,7 +21,7 @@ async def extract_text(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     try:
-        extracted_text = extract_text_from_image(file_path)
+        extracted_text = extract_text_from_file(file)
         return {
             "filename": file.filename,
             "extracted_text": extracted_text
