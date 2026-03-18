@@ -12,6 +12,8 @@ WORKDIR /app
 # Copy files
 COPY . .
 
+ENV PYTHONPATH=/app
+
 # Install Python dependencies
 RUN pip install --no-cache-dir -r pillio_backend/requirements.txt
 
