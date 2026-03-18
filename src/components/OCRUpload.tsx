@@ -25,7 +25,7 @@ const OCRUpload = ({ onResult }: OCRUploadProps) => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://127.0.0.1:8000/api/v1/ocr/extract-text",
+        "https://medimate-k4yl.onrender.com/api/v1/ocr/extract-text",
         formData
       );
 
