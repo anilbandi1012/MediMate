@@ -13,7 +13,7 @@ WORKDIR /app
 COPY . .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r pillio_backend/requirements.txt
 
 # Run FastAPI
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
