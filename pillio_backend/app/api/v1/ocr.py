@@ -21,7 +21,7 @@ async def extract_text(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     try:
-        extracted_text = extract_text_from_file(file)
+        extracted_text = await extract_text_from_file(file)
         return {
             "filename": file.filename,
             "extracted_text": extracted_text
