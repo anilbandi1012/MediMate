@@ -120,7 +120,7 @@ export function ReminderFormDialog({ open, onOpenChange, reminder, onSuccess }: 
     try {
       if (isEditing && reminder) {
         const updateData: ReminderUpdate = {
-          reminder_time: form.reminder_time + ':00',
+          reminder_time: form.reminder_time,
           frequency: form.frequency as 'daily' | 'specific_days' | 'interval',
           specific_days: form.specific_days.length > 0 ? form.specific_days : undefined,
           interval_days: form.frequency === 'interval' ? form.interval_days : undefined,
@@ -136,7 +136,7 @@ export function ReminderFormDialog({ open, onOpenChange, reminder, onSuccess }: 
       } else {
         const createData: ReminderCreate = {
           medicine_id: parseInt(form.medicine_id),
-          reminder_time: form.reminder_time + ':00',
+          reminder_time: form.reminder_time,
           frequency: form.frequency as 'daily' | 'specific_days' | 'interval',
           specific_days: form.specific_days.length > 0 ? form.specific_days : undefined,
           interval_days: form.frequency === 'interval' ? form.interval_days : undefined,

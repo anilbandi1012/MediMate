@@ -26,7 +26,7 @@ class ReminderCreate(ReminderBase):
 
 # Reminder update schema
 class ReminderUpdate(BaseModel):
-    reminder_time: Optional[time] = None
+    reminder_time: time
     frequency: Optional[FrequencyType] = None
     specific_days: Optional[List[int]] = None
     interval_days: Optional[int] = None  # For interval frequency

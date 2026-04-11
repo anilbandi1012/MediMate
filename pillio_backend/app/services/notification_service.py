@@ -283,8 +283,9 @@ class NotificationService:
             Notification.is_read == False
         )
     )
+        query = query.limit(1)
         result = await self.db.execute(query)
-        return result.scalar_one_or_none()
+        return result.scalars().first()
 
     
     async def take_action(

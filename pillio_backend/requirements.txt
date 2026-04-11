@@ -25,3 +25,5 @@ pytest-asyncio
 httpx
 pywebpush
 pdf2image
+firebase-admin
+firebase

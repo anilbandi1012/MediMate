@@ -86,11 +86,11 @@ class MedicineService:
             
         except SQLAlchemyError as e:
             await self.db.rollback()
-            logger.error(f"Database error creating medicine: {e}")
+            # logger.error(f"Database error creating medicine: {e}")
             raise
         except Exception as e:
             await self.db.rollback()
-            logger.error(f"Unexpected error creating medicine: {e}")
+            # logger.error(f"Unexpected error creating medicine: {e}")
             raise
     
     async def get_medicine_by_id(self, medicine_id: int, user_id: int) -> Optional[Medicine]:
@@ -127,10 +127,10 @@ class MedicineService:
             return result.scalar_one_or_none()
             
         except SQLAlchemyError as e:
-            logger.error(f"Database error getting medicine by name '{name}': {e}")
+            # logger.error(f"Database error getting medicine by name '{name}': {e}")
             return None
         except Exception as e:
-            logger.error(f"Unexpected error getting medicine by name '{name}': {e}")
+            # logger.error(f"Unexpected error getting medicine by name '{name}': {e}")
             return None
     
     async def get_medicines(

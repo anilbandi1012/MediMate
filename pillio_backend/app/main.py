@@ -24,11 +24,16 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.jobs.notifications_scheduler import run_notification_checks
 from app.jobs.notifications_scheduler import check_low_stock
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.ERROR)
+
+logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
+logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
+logging.getLogger("apscheduler").setLevel(logging.CRITICAL)
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(run_notification_checks, "interval", minutes=1)
-scheduler.start()
+scheduler.add_job(run_notification_checks, "interval", minutes=5)
+# scheduler.start()
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -106,7 +111,7 @@ async def permission_exception_handler(request, exc: PermissionException):
 
 @app.exception_handler(ValidationException)
 async def validation_exception_handler(request, exc: ValidationException):
-    logger.warning(f"Validation exception: {exc.detail}")
+    logger.debug(f"Validation exception: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail}
@@ -115,7 +120,7 @@ async def validation_exception_handler(request, exc: ValidationException):
 
 @app.exception_handler(NotFoundException)
 async def not_found_exception_handler(request, exc: NotFoundException):
-    logger.warning(f"Not found exception: {exc.detail}")
+    logger.debug(f"Not found exception: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail}
@@ -124,7 +129,7 @@ async def not_found_exception_handler(request, exc: NotFoundException):
 
 @app.exception_handler(ConflictException)
 async def conflict_exception_handler(request, exc: ConflictException):
-    logger.warning(f"Conflict exception: {exc.detail}")
+    logger.debug(f"Conflict exception: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail}
@@ -133,7 +138,7 @@ async def conflict_exception_handler(request, exc: ConflictException):
 
 @app.exception_handler(BadRequestException)
 async def bad_request_exception_handler(request, exc: BadRequestException):
-    logger.warning(f"Bad request exception: {exc.detail}")
+    logger.debug(f"Bad request exception: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail}
@@ -190,6 +195,7 @@ app.include_router(
 )    
 
 app.include_router(ocr_router, prefix="/api/v1")
+
 
 # Health check endpoint
 @app.get("/health")

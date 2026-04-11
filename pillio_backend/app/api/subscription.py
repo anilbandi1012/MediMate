@@ -31,9 +31,9 @@ def send_test_notification():
                 "sub": "mailto:anil20cm050@gmail.com"
             }
         )
-        print("Sending push to:", sub)
+        # print("Sending push to:", sub)
     
-    print("All notifications sent:", subscriptions)
+    # print("All notifications sent:", subscriptions)
     
 
     return {"message": "Test notification sent"}

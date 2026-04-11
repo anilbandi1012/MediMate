@@ -19,12 +19,12 @@ interface ReminderDisplay {
   is_pending: boolean;
 }
 
-function ReminderItem({ 
-  reminder, 
-  onTake, 
-  onSkip 
-}: { 
-  reminder: ReminderDisplay; 
+function ReminderItem({
+  reminder,
+  onTake,
+  onSkip
+}: {
+  reminder: ReminderDisplay;
   onTake: (id: number) => void;
   onSkip: (id: number) => void;
 }) {
@@ -66,9 +66,9 @@ function ReminderItem({
         className={cn(
           'w-10 h-10 rounded-full flex items-center justify-center',
           reminder.status === 'taken' ? 'bg-success/10 text-success' :
-          reminder.status === 'pending' ? 'bg-accent/10 text-accent' :
-          reminder.status === 'missed' ? 'bg-destructive/10 text-destructive' :
-          'bg-muted text-muted-foreground'
+            reminder.status === 'pending' ? 'bg-accent/10 text-accent' :
+              reminder.status === 'missed' ? 'bg-destructive/10 text-destructive' :
+                'bg-muted text-muted-foreground'
         )}
       >
         {config.icon}
@@ -90,16 +90,16 @@ function ReminderItem({
 
       {reminder.status === 'pending' && (
         <div className="flex gap-2">
-          <Button 
-            size="sm" 
-            variant="outline" 
+          <Button
+            size="sm"
+            variant="outline"
             className="h-8"
             onClick={() => onSkip(reminder.id)}
           >
             Skip
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             className="h-8 gradient-primary"
             onClick={() => onTake(reminder.id)}
           >
@@ -117,22 +117,36 @@ export default function UpcomingReminders() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchReminders();
+    const interval = setInterval(() => {
+      fetchReminders();
+    }, 30000); // every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
   const fetchReminders = async () => {
     try {
       setLoading(true);
       const response = await remindersApi.getTodayWithStatus();
       const data = response.data;
-      
-      const formatted: ReminderDisplay[] = data.map((r) => ({
-        id: r.id,
-        medicineName: r.medicineName,
-        dosage: r.dosage || 'As prescribed',
-        time: new Date(r.time),
-        status: r.is_pending ? 'pending' : (r.status === 'upcoming' ? 'upcoming' : r.status),
-        is_pending: r.is_pending,
-      }));
-      
+
+      const now = new Date();
+
+      const formatted: ReminderDisplay[] = data
+        .map((r) => ({
+          id: r.id,
+          medicineName: r.medicineName,
+          dosage: r.dosage || 'As prescribed',
+          time: new Date(r.time),
+          status: r.status,
+          is_pending: r.is_pending,
+        }))
+        .filter((r) => r.time <= now);
+
       setReminders(formatted);
+      console.log("API reminders:", data);
+      console.log("Formatted reminders:", formatted);
     } catch (error) {
       console.error('Failed to fetch reminders:', error);
       toast({
@@ -144,10 +158,6 @@ export default function UpcomingReminders() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchReminders();
-  }, []);
 
   const handleTake = async (id: number) => {
     try {
@@ -219,8 +229,8 @@ export default function UpcomingReminders() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <ReminderItem 
-                reminder={reminder} 
+              <ReminderItem
+                reminder={reminder}
                 onTake={handleTake}
                 onSkip={handleSkip}
               />

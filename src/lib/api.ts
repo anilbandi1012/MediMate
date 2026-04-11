@@ -1,7 +1,7 @@
 // api.ts - Axios client for Pillio FastAPI backend
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
-const API_BASE_URL =  'https://medimate-k4yl.onrender.com/api/v1';
+const API_BASE_URL =  'http://localhost:8000/api/v1';
 
 // ---------------- Token helpers ----------------
 const getToken = (storageType: 'local' | 'session') =>
@@ -34,6 +34,7 @@ const api = axios.create({
   baseURL: API_BASE_URL, // Already includes /api/v1
   headers: { 'Content-Type': 'application/json' },
 });
+
 
 // Add Authorization token to requests
 api.interceptors.request.use((config) => {

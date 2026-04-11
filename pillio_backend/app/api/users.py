@@ -13,11 +13,44 @@ from app.models.reminder import Reminder
 from app.models.reminder_log import ReminderLog
 from app.schemas.user import User as UserSchema, UserUpdate
 from app.schemas.common import MessageResponse, PaginatedResponse
+from app.services.firebase_service import send_push_notification
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+user_tokens = {}
+
+@router.post("/save-token")
+async def save_token(data: dict):
+    token = data.get("token")
+
+    if not token:
+        return {"error": "Token missing"}
+
+    # TODO: replace with real user ID from auth
+    # user_id = token
+
+    user_tokens[1] = token
+
+    # print("Saved token:", token)
+
+    return {"message": "Token saved successfully"}
+
+@router.post("/test-notification")
+async def test_notification():
+    token = user_tokens.get(1)
+
+    if not token:
+        return {"error": "No token found"}
+
+    response = send_push_notification(
+        token,
+        "Medicine Reminder 💊",
+        "Time to take your medicine!"
+    )
+
+    return {"message": "Notification sent", "response": response}
 
 @router.get("/profile", response_model=UserSchema)
 async def get_user_profile(

@@ -144,83 +144,79 @@ class ReminderService:
     async def get_today_reminders(self, user_id: int) -> List[Reminder]:
         """Get all active reminders for today"""
         today = date.today()
-        
-        query = select(Reminder).where(
-            and_(
+        weekday = today.weekday()  # Monday=0 ... Sunday=6
+
+        stmt = (
+            select(Reminder)
+            .options(selectinload(Reminder.medicine))
+            .where(
                 Reminder.user_id == user_id,
                 Reminder.is_active == True,
                 Reminder.start_date <= today,
-                or_(
-                    Reminder.end_date.is_(None),
-                    Reminder.end_date >= today
-                )
+                (Reminder.end_date.is_(None)) | (Reminder.end_date >= today)
             )
+            .order_by(Reminder.reminder_time)
         )
-        query = query.options(selectinload(Reminder.medicine))
-        query = query.order_by(Reminder.reminder_time.asc())
-        
-        result = await self.db.execute(query)
+
+        result = await self.db.execute(stmt)
         reminders = result.scalars().all()
-        
-        # Filter by specific days for weekly reminders
-        today_weekday = today.weekday()
-        filtered_reminders = []
-        
+
+        today_reminders = []
+
         for reminder in reminders:
-            if reminder.frequency == FrequencyType.DAILY.value:
-                filtered_reminders.append(reminder)
-            elif reminder.frequency == FrequencyType.SPECIFIC_DAYS.value:
-                if reminder.specific_days and today_weekday in reminder.specific_days:
-                    filtered_reminders.append(reminder)
-            elif reminder.frequency == FrequencyType.INTERVAL.value:
-                # Interval frequency - include all for now
-                filtered_reminders.append(reminder)
-        
-        return filtered_reminders
+            if reminder.frequency == "daily":
+                today_reminders.append(reminder)
+
+            elif reminder.frequency == "specific_days":
+                # your UI sends 0=Sunday, 1=Monday ... 6=Saturday
+                # Python weekday() gives Monday=0 ... Sunday=6
+                app_day = (weekday + 1) % 7
+                if reminder.specific_days and app_day in reminder.specific_days:
+                    today_reminders.append(reminder)
+
+            elif reminder.frequency == "interval":
+                if reminder.interval_days and reminder.start_date:
+                    days_since_start = (today - reminder.start_date).days
+                    if days_since_start >= 0 and days_since_start % reminder.interval_days == 0:
+                        today_reminders.append(reminder)
+
+        return today_reminders
     
     async def get_reminder_status(
-        self, reminder_id: int, for_date: Optional[date] = None
-    ) -> Tuple[Optional[ReminderLog], ReminderStatus]:
-        """Get the current status of a reminder for a specific date"""
+    self, reminder: Reminder, for_date: Optional[date] = None
+):
         if for_date is None:
             for_date = date.today()
-        
-        # Get today's log entry directly from reminder_logs table
-        # This doesn't require fetching the reminder first
+
         start_of_day = datetime.combine(for_date, time.min)
         end_of_day = datetime.combine(for_date, time.max)
-        
-        query = select(ReminderLog).where(
-            and_(
-                ReminderLog.reminder_id == reminder_id,
-                ReminderLog.scheduled_time >= start_of_day,
-                ReminderLog.scheduled_time <= end_of_day
+
+        query = (
+            select(ReminderLog)
+            .where(
+                and_(
+                    ReminderLog.reminder_id == reminder.id,
+                    ReminderLog.scheduled_time >= start_of_day,
+                    ReminderLog.scheduled_time <= end_of_day
+                )
             )
+            .order_by(ReminderLog.created_at.desc())
+            .limit(1)
         )
-        query = query.order_by(ReminderLog.created_at.desc()).limit(1)
-        
+
         result = await self.db.execute(query)
         log = result.scalar_one_or_none()
-        
+
         if log:
             return log, log.status
-        
-        # No log exists - check if reminder is overdue
-        # We need to get the reminder_time from the reminder table
-        reminder_query = select(Reminder).where(Reminder.id == reminder_id)
-        reminder_result = await self.db.execute(reminder_query)
-        reminder = reminder_result.scalar_one_or_none()
-        
-        if not reminder:
-            return None, ReminderStatus.MISSED
-        
+
         now = datetime.now()
         reminder_datetime = datetime.combine(for_date, reminder.reminder_time)
-        
-        if now > reminder_datetime:
-            return None, ReminderStatus.MISSED
-        
-        return None, ReminderStatus.SKIPPED  # Default status before action
+
+        if now < reminder_datetime:
+            return None, "upcoming"
+
+        return None, "pending" 
     
     async def mark_reminder_taken(
         self, reminder_id: int, user_id: int, notes: Optional[str] = None

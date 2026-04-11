@@ -122,53 +122,69 @@ async def get_today_reminders(
         )
 
 
+from datetime import date, datetime, time
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 @router.get("/today-with-status", response_model=list[dict])
 async def get_today_reminders_with_status(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
     reminder_service: ReminderService = Depends(get_reminder_service)
 ):
-    """Get today's pending reminders with their status (taken/skipped/missed/pending)"""
     try:
         reminders = await reminder_service.get_today_reminders(user_id=current_user.id)
         today = date.today()
         now = datetime.now()
-        
-        logger.debug(f"Found {len(reminders)} reminders for today")
-        
+
+        reminder_ids = [r.id for r in reminders]
+
+        start_of_day = datetime.combine(today, time.min)
+        end_of_day = datetime.combine(today, time.max)
+
+        log_map = {}
+
+        if reminder_ids:
+            logs_result = await db.execute(
+                select(ReminderLog)
+                .where(
+                    ReminderLog.reminder_id.in_(reminder_ids),
+                    ReminderLog.scheduled_time >= start_of_day,
+                    ReminderLog.scheduled_time <= end_of_day
+                )
+                .order_by(ReminderLog.reminder_id, ReminderLog.created_at.desc())
+            )
+
+            logs = logs_result.scalars().all()
+
+            for log in logs:
+                if log.reminder_id not in log_map:
+                    log_map[log.reminder_id] = log
+
         result = []
+
         for reminder in reminders:
-            # Get status for this reminder
-            log, status = await reminder_service.get_reminder_status(reminder.id, today)
-            
-            logger.debug(f"Reminder {reminder.id}: status={status}, is_pending check")
-            
-            # Skip reminders that have been taken or skipped
-            if status in [ReminderStatus.TAKEN.value, ReminderStatus.SKIPPED.value]:
-                logger.debug(f"Skipping reminder {reminder.id} with status {status}")
-                continue
-            
-            # Determine if pending (due now and not yet taken/skipped)
             reminder_datetime = datetime.combine(today, reminder.reminder_time)
-            is_pending = now >= reminder_datetime and status not in [ReminderStatus.TAKEN.value, ReminderStatus.SKIPPED.value]
-            
-            # Build medicine name and dosage
+
+            if now < reminder_datetime:
+                continue
+
+            log = log_map.get(reminder.id)
+
+            if log:
+                display_status = log.status
+            else:
+                display_status = "pending"
+
             medicine_name = reminder.medicine.name if reminder.medicine else "Unknown"
+
             dosage = ""
             if reminder.dosage_amount:
                 dosage = f"{reminder.dosage_amount}"
                 if reminder.dosage_unit:
                     dosage += f" {reminder.dosage_unit}"
-            
-            # Map status for frontend
-            # SKIPPED should show as 'upcoming' if not yet past time, otherwise as 'skipped'
-            display_status = status
-            if status == ReminderStatus.SKIPPED.value:
-                display_status = "upcoming"
-            elif status == ReminderStatus.MISSED.value and not is_pending:
-                display_status = "missed"
-            
-            # Build reminder dict without the full ORM object
+
             reminder_dict = {
                 "id": reminder.id,
                 "user_id": reminder.user_id,
@@ -187,23 +203,20 @@ async def get_today_reminders_with_status(
                 "created_at": reminder.created_at.isoformat() if reminder.created_at else None,
                 "updated_at": reminder.updated_at.isoformat() if reminder.updated_at else None,
             }
-            
+
             result.append({
                 "id": reminder.id,
                 "medicineName": medicine_name,
                 "dosage": dosage,
                 "time": reminder_datetime.isoformat(),
                 "status": display_status,
-                "is_pending": is_pending,
+                "is_pending": display_status == "pending",
                 "reminder": reminder_dict
             })
-        
-        # Sort by time
+
         result.sort(key=lambda x: x["time"])
-        
-        logger.debug(f"Returning {len(result)} reminders for dashboard")
-        
         return result
+
     except Exception as e:
         logger.error(f"Error fetching reminders with status: {type(e).__name__}: {str(e)}", exc_info=True)
         raise HTTPException(
