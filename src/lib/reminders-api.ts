@@ -224,4 +224,7 @@ export const remindersApi = {
     api.post<{ message: string; count: number }>('/reminders/mark-missed'),
 };
 
+const res = await api.get('/reminders/today-with-status');
+console.log("today reminders:", res.data);
+
 export default remindersApi;

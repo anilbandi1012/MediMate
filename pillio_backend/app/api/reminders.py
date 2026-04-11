@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date
+from zoneinfo import ZoneInfo
 import logging
 from app.database import get_db
 from app.core.security import get_current_user
@@ -135,8 +136,9 @@ async def get_today_reminders_with_status(
 ):
     try:
         reminders = await reminder_service.get_today_reminders(user_id=current_user.id)
-        today = date.today()
-        now = datetime.now()
+        now = datetime.now(ZoneInfo("Asia/Kolkata"))
+        today = now.date()
+        
 
         reminder_ids = [r.id for r in reminders]
 
@@ -167,7 +169,7 @@ async def get_today_reminders_with_status(
         for reminder in reminders:
             reminder_datetime = datetime.combine(today, reminder.reminder_time)
 
-            if now < reminder_datetime:
+            if now.replace(tzinfo=None) < reminder_datetime:
                 continue
 
             log = log_map.get(reminder.id)
@@ -178,6 +180,7 @@ async def get_today_reminders_with_status(
                 display_status = "pending"
 
             medicine_name = reminder.medicine.name if reminder.medicine else "Unknown"
+            
 
             dosage = ""
             if reminder.dosage_amount:
@@ -211,7 +214,9 @@ async def get_today_reminders_with_status(
                 "time": reminder_datetime.isoformat(),
                 "status": display_status,
                 "is_pending": display_status == "pending",
-                "reminder": reminder_dict
+                "reminder": reminder_dict,
+                "server_now": str(now),
+                "server_today": str(today),
             })
 
         result.sort(key=lambda x: x["time"])
@@ -223,6 +228,7 @@ async def get_today_reminders_with_status(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch reminders with status"
         )
+
 
 
 @router.get("/history")
