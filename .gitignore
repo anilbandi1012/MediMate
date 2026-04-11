@@ -88,3 +88,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+pillio_backend/serviceAccountKey.json
+.env
+venv/
+__pycache__/
