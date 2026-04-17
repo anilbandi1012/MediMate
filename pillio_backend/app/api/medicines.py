@@ -29,7 +29,6 @@ from app.core.exceptions import (
     MedicineNotFoundException, MedicineAlreadyExistsException,
     InsufficientStockException
 )
-from pillio_backend.app.models import user
 
 logger = logging.getLogger(__name__)
 
