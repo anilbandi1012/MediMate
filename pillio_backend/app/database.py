@@ -28,7 +28,7 @@ except Exception as e:
     # logger.error(f"Failed to create database engine: {e}")
     raise
 
-print("DATABASE_URL =", DATABASE_URL)
+# print("DATABASE_URL =", DATABASE_URL)
 
 # Create async session factory
 AsyncSessionLocal = async_sessionmaker(

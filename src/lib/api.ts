@@ -1,7 +1,7 @@
 // api.ts - Axios client for Pillio FastAPI backend
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
-const API_BASE_URL =  import.meta.env.VITE_API_URL;
+const API_BASE_URL =  'https://medimate-k4yl.onrender.com/api/v1';
 
 // ---------------- Token helpers ----------------
 const getToken = (storageType: 'local' | 'session') =>
