@@ -29,6 +29,7 @@ from app.core.exceptions import (
     MedicineNotFoundException, MedicineAlreadyExistsException,
     InsufficientStockException
 )
+from pillio_backend.app.models import user
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +74,7 @@ async def create_medicine(
     current_user: User = Depends(get_current_user),
     medicine_service: MedicineService = Depends(get_medicine_service)
 ):
+    user_id = current_user.id
     """
     Create a new medicine
     
@@ -87,14 +89,14 @@ async def create_medicine(
     """
     try:
         medicine = await medicine_service.create_medicine(
-            user_id=current_user.id,
-            medicine_data=medicine_data
+            medicine_data=medicine_data,
+            user_id=user_id
         )
         logger.info(f"Medicine created: '{medicine.name}' (ID: {medicine.id}) for user {current_user.id}")
         return medicine
     
     except MedicineAlreadyExistsException:
-        logger.warning(f"Medicine creation failed: '{medicine_data.name}' already exists for user {current_user.id}")
+        logger.warning( f"Medicine creation failed: '{medicine_data.name}' already exists for user {user_id}")   
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Medicine '{medicine_data.name}' already exists"
